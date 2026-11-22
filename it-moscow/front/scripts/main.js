@@ -1,10 +1,3 @@
-const seed = [
- {"id":"demo-1","type":"offer","category":"Книги","title":"Грокаем алгоритмы","course":"Алгоритмы","description":"Бумажная книга с примерами на Python. Могу передать после занятий.","tag":"◫"},
- {"id":"demo-2","type":"request","category":"Конспекты","title":"Конспект по сетям","course":"Компьютерные сети","description":"Ищу материалы по адресации и подсетям для подготовки к зачёту.","tag":"≡"},
- {"id":"demo-3","type":"offer","category":"Материалы","title":"Шаблон для курсового проекта","course":"Веб-разработка","description":"Структура отчёта и чек-лист перед защитой. Подойдёт как основа для своего проекта.","tag":"⌘"},
- {"id":"demo-4","type":"request","category":"Книги","title":"Справочник по базам данных","course":"Базы данных","description":"Нужен учебник с задачами по SQL. Готов обменять на сборник по Python.","tag":"◫"}
-];
-
 const storageKey = 'it-moscow.exchange.v1';
 const labels = { offer: 'Предложение', request: 'Запрос' };
 const icons = { 'Книги': '◫', 'Конспекты': '≡', 'Материалы': '⌘' };
@@ -62,10 +55,9 @@ function makeCard(item) {
   card.dataset.kind = item.type;
   const badges = element('div', '', 'badges');
   badges.append(element('span', labels[item.type], 'chip ' + item.type), element('span', item.category, 'chip'));
-  const more = element('button', 'Подробнее', 'button small');
-  more.type = 'button';
+  const more = element('a', 'Подробнее', 'button small');
+  more.href = 'material.html?id=' + encodeURIComponent(item.id);
   more.setAttribute('aria-label', 'Подробнее: ' + item.title);
-  more.addEventListener('click', () => openDetails(item));
   card.append(element('span', icons[item.category], 'card-icon'), element('h3', item.title),
     element('p', item.course, 'meta'), element('p', item.description), badges, element('p', ''), more);
   return card;

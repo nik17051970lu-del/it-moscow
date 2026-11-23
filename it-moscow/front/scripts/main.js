@@ -52,6 +52,12 @@ function openDetails(item) {
 }
 function makeCard(item) {
   const card = element('article', '', 'card');
+  const image = document.createElement('img');
+  image.src = categoryImages[item.category] || categoryImages['Материалы'];
+  image.alt = 'Иллюстрация категории «' + item.category + '»';
+  image.width = 640; image.height = 400; image.loading = 'lazy';
+  image.className = 'listing-image';
+  card.append(image);
   card.dataset.kind = item.type;
   const badges = element('div', '', 'badges');
   badges.append(element('span', labels[item.type], 'chip ' + item.type), element('span', item.category, 'chip'));
@@ -64,6 +70,7 @@ function makeCard(item) {
 }
 function openEditor() {
   form.reset();
+  restorePublishDraft();
   clearValidation(form);
   document.querySelector('[data-form-note]').textContent = '';
   editor.showModal();
@@ -107,6 +114,7 @@ form.addEventListener('submit', event => {
   }
   board.own.unshift({ id: 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2), type: values.get('type'), category: values.get('category'), title, course, description, own: true });
   const stored = saveBoard();
+  try { localStorage.removeItem('it-moscow.publish-draft.v1'); } catch {}
   editor.close();
   chooseType('');
   byId('search').value = '';
@@ -272,3 +280,36 @@ registrationForm.addEventListener('submit', event => {
   }
 });
 if (demoProfile) byId('open-registration').textContent = 'Мой профиль';
+
+// Only non-sensitive publication drafts and catalog preferences are persisted.
+function restorePublishDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem('it-moscow.publish-draft.v1'));
+    if (!draft || typeof draft !== 'object') return;
+    for (const name of ['type','category','title','course','description']) {
+      const field = form.elements.namedItem(name);
+      if (typeof draft[name] === 'string') field.value = draft[name].slice(0, field.maxLength > 0 ? field.maxLength : 320);
+    }
+  } catch {}
+}
+form.addEventListener('input', () => {
+  const draft = {};
+  for (const name of ['type','category','title','course','description']) draft[name] = form.elements.namedItem(name).value;
+  try { localStorage.setItem('it-moscow.publish-draft.v1', JSON.stringify(draft)); }
+  catch { document.querySelector('[data-form-note]').textContent = 'Черновик не сохранён: хранилище недоступно. Не закрывай вкладку до публикации.'; }
+});
+function saveFilters() {
+  try { localStorage.setItem('it-moscow.filters.v1', JSON.stringify({search:byId('search').value, category:byId('category').value, type:selectedType})); } catch {}
+}
+byId('search').addEventListener('input',saveFilters);
+byId('category').addEventListener('change',saveFilters);
+tabs.forEach(tab => tab.addEventListener('click',saveFilters));
+try {
+  const filters = JSON.parse(localStorage.getItem('it-moscow.filters.v1'));
+  if (filters && typeof filters === 'object') {
+    if (typeof filters.search === 'string') byId('search').value = filters.search.slice(0,254);
+    if (typeof filters.category === 'string') byId('category').value = filters.category;
+    chooseType(['offer','request'].includes(filters.type) ? filters.type : '');
+    render();
+  }
+} catch {}

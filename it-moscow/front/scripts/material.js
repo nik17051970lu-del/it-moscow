@@ -24,11 +24,12 @@ if (!item) {
   ];
   get('material').hidden = false;
   document.title = item.title + ' · IT.МОСКВА';
-  for (const target of ['material-title', 'cover-title', 'crumb']) get(target).textContent = item.title;
+  for (const target of ['material-title', 'crumb']) get(target).textContent = item.title;
   get('material-type').textContent = request ? 'Запрос' : 'Предложение';
   get('material-type').className = 'chip ' + item.type;
   get('material-category').textContent = item.category;
-  get('cover-category').textContent = item.category.toLocaleUpperCase('ru');
+  get('material-image').src = categoryImages[item.category] || categoryImages['Материалы'];
+  get('material-image').alt = 'Иллюстрация категории «' + item.category + '»';
   get('material-course').textContent = item.course;
   get('material-value').textContent = request ? 'Ищу материал' : 'Обмен по договорённости';
   get('material-terms').textContent = 'Стоимость и условия уточняются у автора. Оплата на сайте не предусмотрена.';

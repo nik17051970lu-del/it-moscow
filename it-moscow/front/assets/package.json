@@ -1,0 +1,9 @@
+{
+  "name": "it-moscow-student-exchange",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Стол заказов проектов — обмен учебными материалами IT.МОСКВА",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server.js", "dev": "node --watch server.js", "test": "node --test tests/*.test.js" },
+  "dependencies": { "express": "^5.1.0" }
+}
